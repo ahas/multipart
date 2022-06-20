@@ -1,0 +1,36 @@
+{
+    "name": "@ahas/multipart",
+    "version": "1.0.0",
+    "description": "Multipart form data parser",
+    "main": "index.ts",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ahas/join-url.git"
+    },
+    "bugs": {
+        "url": "https://github.com/ahas/join-url/issues"
+    },
+    "engines": {
+        "node": ">=14.6.0"
+    },
+    "author": "ahas",
+    "license": "MIT",
+    "files": [
+        "index.ts"
+    ],
+    "keywords": [
+        "form-data",
+        "multipart"
+    ],
+    "scripts": {
+        "build": "tsc -p tsconfig.json"
+    },
+    "devDependencies": {
+        "@types/form-data": "^2.5.0",
+        "@types/node": "^18.0.0",
+        "typescript": "^4.7.4"
+    },
+    "dependencies": {
+        "form-data": "^4.0.0"
+    }
+}

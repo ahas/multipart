@@ -8,7 +8,8 @@
         "url": "git+https://github.com/ahas/join-url.git"
     },
     "bugs": {
-        "url": "https://github.com/ahas/join-url/issues"
+        "url": "https://github.com/ahas/join-url/issues",
+        "format": "prettier --write \"src/**/*.ts\""
     },
     "engines": {
         "node": ">=14.6.0"
@@ -28,6 +29,7 @@
     "devDependencies": {
         "@types/form-data": "^2.5.0",
         "@types/node": "^18.0.0",
+        "prettier": "^2.7.1",
         "typescript": "^4.7.4"
     },
     "dependencies": {

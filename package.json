@@ -1,14 +1,14 @@
 {
     "name": "@ahas/multipart",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Multipart form data parser",
     "main": "index.ts",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/ahas/join-url.git"
+        "url": "git+https://github.com/ahas/multipart.git"
     },
     "bugs": {
-        "url": "https://github.com/ahas/join-url/issues",
+        "url": "https://github.com/ahas/multipart/issues",
         "format": "prettier --write \"src/**/*.ts\""
     },
     "engines": {

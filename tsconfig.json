@@ -1,9 +1,12 @@
 {
-    "compilerOptions": {
-        "target": "es2016",
-        "moduleResolution": "node",
-        "esModuleInterop": true,
-        "declaration": true,
-        "outDir": "dist"
-    }
+  "compilerOptions": {
+    "target": "es2016",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "declaration": true,
+    "outDir": "dist",
+    "baseUrl": "src"
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"]
 }

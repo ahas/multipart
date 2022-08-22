@@ -79,7 +79,9 @@ const encode = (obj: any, options?: MultipartOptions, formData?: FormData, lastK
         formData.append(lastKey, "array;empty");
       }
     } else if (isDate(obj)) {
-      formData.append(lastKey, opts.plain ? obj : "datencodegex;" + obj.toString());
+      formData.append(lastKey, opts.plain ? obj : "date;" + obj.toString());
+    } else if (isRegex(obj)) {
+      formData.append(lastKey, opts.plain ? obj.toString() : "regex;" + obj.toString());
     } else {
       formData.append(lastKey, obj);
     }

@@ -12,6 +12,7 @@ const isFile = (value) => isBlob(value) &&
     typeof value.name === "string" &&
     (typeof value.lastModifiedDate === "object" || typeof value.lastModified === "number");
 const isFileArray = (value) => Array.isArray(value) && !value.find((x) => !isFile(x));
+const isRegex = (value) => value instanceof RegExp;
 const form = (obj, options) => {
     return encode(obj, Object.assign(Object.assign({}, options), { plain: true }));
 };
@@ -74,7 +75,7 @@ const encode = (obj, options, formData, lastKey) => {
             }
         }
         else if (isDate(obj)) {
-            formData.append(lastKey, opts.plain ? obj : "date;" + obj.toISOString());
+            formData.append(lastKey, opts.plain ? obj : "datencodegex;" + obj.toString());
         }
         else {
             formData.append(lastKey, obj);
@@ -89,6 +90,7 @@ const numberType = "number;";
 const stringType = "string;";
 const dateType = "date;";
 const emptyArrayType = "array;empty";
+const regexType = "regex;";
 export function parseValue(value) {
     if (value === nullType) {
         return null;
@@ -110,6 +112,16 @@ export function parseValue(value) {
     }
     else if (value.startsWith(dateType)) {
         return new Date(value.substring(dateType.length));
+    }
+    else if (value.startsWith(regexType)) {
+        const str = value.toString();
+        const lastSlash = str.lastIndexOf("/");
+        if (lastSlash >= 0) {
+            const exp = str.substring(1, lastSlash);
+            const flags = str.substring(lastSlash + 1);
+            return new RegExp(exp, flags);
+        }
+        return new RegExp("");
     }
     return value;
 }

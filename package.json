@@ -1,6 +1,6 @@
 {
   "name": "@ahas/multipart",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Multipart form data parser",
   "main": "dist/index.js",
   "files": [
@@ -25,7 +25,8 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "format": "prettier --write \"src/**/*.ts\""
+    "format": "prettier --write \"src/**/*.ts\"",
+    "test": "node test"
   },
   "devDependencies": {
     "@types/form-data": "^2.5.0",

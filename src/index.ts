@@ -1,11 +1,9 @@
-import FormData from "form-data";
-
 const isUndefined = (value: any) => value === undefined;
 const isNull = (value: any) => value === null;
 const isBoolean = (value: any) => typeof value === "boolean";
 const isNumber = (value: any) => typeof value === "number";
 const isString = (value: any) => typeof value === "string";
-const isObject = (value: any) => value === Object(value);
+const isObject = (value: any) => value === Object(value) && !Array.isArray(value);
 const isArray = (value: any) => Array.isArray(value);
 const isDate = (value: any) => value instanceof Date;
 const isBlob = (value: any) =>
@@ -14,7 +12,7 @@ const isFile = (value: any) =>
   isBlob(value) &&
   typeof value.name === "string" &&
   (typeof value.lastModifiedDate === "object" || typeof value.lastModified === "number");
-const isFileArray = (value: any) => Array.isArray(value) && !value.find((x) => !isFile(x));
+const isFileArray = (value: any) => Array.isArray(value) && value.length && !value.find((x) => !isFile(x));
 const isRegex = (value: any) => value instanceof RegExp;
 
 export interface MultipartOptions {
@@ -22,29 +20,30 @@ export interface MultipartOptions {
   indices?: boolean;
 }
 
-const form = (obj: any, options?: MultipartOptions) => {
-  return encode(obj, {
+const form = (formData: FormData, obj: any, options?: MultipartOptions) => {
+  return encode(formData, obj, {
     ...options,
     plain: true,
   });
 };
 
-const encode = (obj: any, options?: MultipartOptions, formData?: FormData, lastKey?: string) => {
+const encode = (formData: FormData, obj: any, options?: MultipartOptions, lastKey?: string) => {
   const opts = options || ({} as MultipartOptions);
   opts.indices = isUndefined(opts.indices) ? true : opts.indices;
   opts.plain = isUndefined(opts.plain) ? false : opts.plain;
-  formData = formData || new FormData();
 
   if (obj && isObject(obj) && !isFile(obj) && !isBlob(obj)) {
-    Object.keys(obj).forEach((prop) => {
-      const value = obj[prop];
+    Object.keys(obj).forEach((key) => {
+      const value = obj[key];
+
       if (isArray(value)) {
-        while (prop.length > 2 && prop.lastIndexOf("[]") === prop.length - 2) {
-          prop = prop.substring(0, prop.length - 2);
+        while (key.length > 2 && key.lastIndexOf("[]") === key.length - 2) {
+          key = key.substring(0, key.length - 2);
         }
       }
-      const key = lastKey ? lastKey + "[" + prop + "]" : prop;
-      encode(value, options, formData, key);
+
+      key = lastKey ? lastKey + "[" + key + "]" : key;
+      encode(formData, value, options, key);
     });
   } else if (isUndefined(obj)) {
     return formData;
@@ -54,7 +53,7 @@ const encode = (obj: any, options?: MultipartOptions, formData?: FormData, lastK
         formData.append(lastKey, "null;");
       }
     } else if (isBoolean(obj)) {
-      formData.append(lastKey, opts.plain ? !!obj : obj ? "boolean;true" : "boolean;false");
+      formData.append(lastKey, opts.plain ? (!!obj ? "true" : "false") : obj ? "boolean;true" : "boolean;false");
     } else if (isNumber(obj)) {
       formData.append(lastKey, opts.plain ? obj : "number;" + obj);
     } else if (isString(obj)) {
@@ -73,9 +72,11 @@ const encode = (obj: any, options?: MultipartOptions, formData?: FormData, lastK
       if (obj.length) {
         (obj as any[]).forEach((value, index) => {
           const key = lastKey + "[" + (opts.indices ? index : "") + "]";
-          encode(value, options, formData, key);
+          encode(formData, value, options, key);
         });
-      } else if (!opts.plain) {
+      } else if (opts.plain) {
+        formData.append(lastKey, "[]");
+      } else {
         formData.append(lastKey, "array;empty");
       }
     } else if (isDate(obj)) {

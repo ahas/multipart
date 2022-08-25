@@ -1,36 +1,34 @@
-import FormData from "form-data";
 const isUndefined = (value) => value === undefined;
 const isNull = (value) => value === null;
 const isBoolean = (value) => typeof value === "boolean";
 const isNumber = (value) => typeof value === "number";
 const isString = (value) => typeof value === "string";
-const isObject = (value) => value === Object(value);
+const isObject = (value) => value === Object(value) && !Array.isArray(value);
 const isArray = (value) => Array.isArray(value);
 const isDate = (value) => value instanceof Date;
 const isBlob = (value) => value && typeof value.size === "number" && typeof value.type === "string" && typeof value.slice === "function";
 const isFile = (value) => isBlob(value) &&
     typeof value.name === "string" &&
     (typeof value.lastModifiedDate === "object" || typeof value.lastModified === "number");
-const isFileArray = (value) => Array.isArray(value) && !value.find((x) => !isFile(x));
+const isFileArray = (value) => Array.isArray(value) && value.length && !value.find((x) => !isFile(x));
 const isRegex = (value) => value instanceof RegExp;
-const form = (obj, options) => {
-    return encode(obj, Object.assign(Object.assign({}, options), { plain: true }));
+const form = (formData, obj, options) => {
+    return encode(formData, obj, Object.assign(Object.assign({}, options), { plain: true }));
 };
-const encode = (obj, options, formData, lastKey) => {
+const encode = (formData, obj, options, lastKey) => {
     const opts = options || {};
     opts.indices = isUndefined(opts.indices) ? true : opts.indices;
     opts.plain = isUndefined(opts.plain) ? false : opts.plain;
-    formData = formData || new FormData();
     if (obj && isObject(obj) && !isFile(obj) && !isBlob(obj)) {
-        Object.keys(obj).forEach((prop) => {
-            const value = obj[prop];
+        Object.keys(obj).forEach((key) => {
+            const value = obj[key];
             if (isArray(value)) {
-                while (prop.length > 2 && prop.lastIndexOf("[]") === prop.length - 2) {
-                    prop = prop.substring(0, prop.length - 2);
+                while (key.length > 2 && key.lastIndexOf("[]") === key.length - 2) {
+                    key = key.substring(0, key.length - 2);
                 }
             }
-            const key = lastKey ? lastKey + "[" + prop + "]" : prop;
-            encode(value, options, formData, key);
+            key = lastKey ? lastKey + "[" + key + "]" : key;
+            encode(formData, value, options, key);
         });
     }
     else if (isUndefined(obj)) {
@@ -43,7 +41,7 @@ const encode = (obj, options, formData, lastKey) => {
             }
         }
         else if (isBoolean(obj)) {
-            formData.append(lastKey, opts.plain ? !!obj : obj ? "boolean;true" : "boolean;false");
+            formData.append(lastKey, opts.plain ? (!!obj ? "true" : "false") : obj ? "boolean;true" : "boolean;false");
         }
         else if (isNumber(obj)) {
             formData.append(lastKey, opts.plain ? obj : "number;" + obj);
@@ -67,15 +65,21 @@ const encode = (obj, options, formData, lastKey) => {
             if (obj.length) {
                 obj.forEach((value, index) => {
                     const key = lastKey + "[" + (opts.indices ? index : "") + "]";
-                    encode(value, options, formData, key);
+                    encode(formData, value, options, key);
                 });
             }
-            else if (!opts.plain) {
+            else if (opts.plain) {
+                formData.append(lastKey, "[]");
+            }
+            else {
                 formData.append(lastKey, "array;empty");
             }
         }
         else if (isDate(obj)) {
-            formData.append(lastKey, opts.plain ? obj : "datencodegex;" + obj.toString());
+            formData.append(lastKey, opts.plain ? obj : "date;" + obj.toString());
+        }
+        else if (isRegex(obj)) {
+            formData.append(lastKey, opts.plain ? obj.toString() : "regex;" + obj.toString());
         }
         else {
             formData.append(lastKey, obj);

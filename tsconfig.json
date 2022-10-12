@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "es2016",
-    "moduleResolution": "node",
+    "module": "UMD",
     "esModuleInterop": true,
     "declaration": true,
     "outDir": "dist",

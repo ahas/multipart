@@ -1,6 +1,6 @@
 {
   "name": "@ahas/multipart",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Multipart form data parser",
   "main": "dist/index.js",
   "files": [

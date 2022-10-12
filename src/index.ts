@@ -8,10 +8,14 @@ const isArray = (value: any) => Array.isArray(value);
 const isDate = (value: any) => value instanceof Date;
 const isBlob = (value: any) =>
   value && typeof value.size === "number" && typeof value.type === "string" && typeof value.slice === "function";
+const isBuffer = (value: any) => value && typeof Buffer !== "undefined" && Buffer.isBuffer(value);
+const isReadStream = (value: any) => value && typeof require === "function" && value instanceof require("fs").ReadStream;
 const isFile = (value: any) =>
-  isBlob(value) &&
-  typeof value.name === "string" &&
-  (typeof value.lastModifiedDate === "object" || typeof value.lastModified === "number");
+  isBuffer(value) ||
+  isReadStream(value) ||
+  (isBlob(value) &&
+    typeof value.name === "string" &&
+    (typeof value.lastModifiedDate === "object" || typeof value.lastModified === "number"));
 const isFileArray = (value: any) => Array.isArray(value) && value.length && !value.find((x) => !isFile(x));
 const isRegex = (value: any) => value instanceof RegExp;
 

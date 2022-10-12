@@ -20,14 +20,14 @@ export interface MultipartOptions {
   indices?: boolean;
 }
 
-const form = (formData: FormData, obj: any, options?: MultipartOptions) => {
+const form = (formData: Partial<FormData>, obj: any, options?: MultipartOptions) => {
   return encode(formData, obj, {
     ...options,
     plain: true,
   });
 };
 
-const encode = (formData: FormData, obj: any, options?: MultipartOptions, lastKey?: string) => {
+const encode = (formData: Partial<FormData>, obj: any, options?: MultipartOptions, lastKey?: string) => {
   const opts = options || ({} as MultipartOptions);
   opts.indices = isUndefined(opts.indices) ? true : opts.indices;
   opts.plain = isUndefined(opts.plain) ? false : opts.plain;

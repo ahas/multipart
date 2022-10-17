@@ -1,3 +1,4 @@
+const isBrowser = () => typeof window === "object" && !!window;
 const isUndefined = (value: any) => value === undefined;
 const isNull = (value: any) => value === null;
 const isBoolean = (value: any) => typeof value === "boolean";
@@ -9,13 +10,14 @@ const isDate = (value: any) => value instanceof Date;
 const isBlob = (value: any) =>
   value && typeof value.size === "number" && typeof value.type === "string" && typeof value.slice === "function";
 const isBuffer = (value: any) => value && typeof Buffer !== "undefined" && Buffer.isBuffer(value);
-const isReadStream = (value: any) => value && typeof require === "function" && value instanceof require("fs").ReadStream;
+const isReadStream = (value: any) =>
+  value && typeof require === "function" && value instanceof require("fs").ReadStream;
 const isFile = (value: any) =>
-  isBuffer(value) ||
-  isReadStream(value) ||
-  (isBlob(value) &&
-    typeof value.name === "string" &&
-    (typeof value.lastModifiedDate === "object" || typeof value.lastModified === "number"));
+  isBrowser()
+    ? isBlob(value) &&
+      typeof value.name === "string" &&
+      (typeof value.lastModifiedDate === "object" || typeof value.lastModified === "number")
+    : isBuffer(value) || isReadStream(value);
 const isFileArray = (value: any) => Array.isArray(value) && value.length && !value.find((x) => !isFile(x));
 const isRegex = (value: any) => value instanceof RegExp;
 
